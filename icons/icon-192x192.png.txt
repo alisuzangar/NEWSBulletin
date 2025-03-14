@@ -1,0 +1,5 @@
+This is a placeholder for the icon file. In a real application, you would need to create actual PNG image files for various icon sizes (72x72, 96x96, 128x128, 144x144, 152x152, 192x192, 384x384, 512x512).
+
+For a production app, you would need to create these icon files using an image editor or icon generator tool. The icons should be properly sized PNG images with the appropriate dimensions.
+
+For testing purposes, you can use any image and rename it to match these dimensions, or use an online icon generator to create a set of icons for your PWA.

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no">
+  <title>خبرنامه ایران</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+  <style>
+    /* Import modern Persian font */
+    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
+    
+    :root {
+      --bg-color: #2C3E50; /* Deep Navy for dark mode */
+      --text-color: #ECF0F1; /* Light neutral text */
+      --header-bg: #D4AF37; /* Luxury Gold */
+      --header-text: #2C3E50;
+      --button-bg: #D4AF37;
+      --button-hover: #b7942c;
+      --article-bg: #34495E;
+      --source-text: #BDC3C7;
+      --keyword-bg: #D4AF37;
+      --link-color: #D4AF37;
+      --refresh-button-bg: #27ae60;
+      --refresh-button-hover: #219955;
+    }
+    
+    .light-mode {
+      --bg-color: #ECF0F1;
+      --text-color: #2C3E50;
+      --header-bg: #F7F9FA;
+      --header-text: #2C3E50;
+      --button-bg: #607D8B;
+      --button-hover: #455A64;
+      --article-bg: #ffffff;
+      --source-text: #7F8C8D;
+      --keyword-bg: #607D8B;
+      --link-color: #607D8B;
+      --refresh-button-bg: #27ae60;
+      --refresh-button-hover: #219955;
+    }
+    
+    body {
+      background: var(--bg-color);
+      margin: 0;
+      font-family: 'Vazirmatn', sans-serif;
+      color: var(--text-color);
+      padding: 0;
+      transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 100%;
+      margin: auto;
+      padding: 0;
+    }
+    .header {
+      background: var(--header-bg);
+      padding: 15px;
+      text-align: center;
+      color: var(--header-text);
+      margin-bottom: 10px;
+      position: relative;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 1.8em;
+    }
+    /* Wrapper for toggle button */
+    .toggle-container {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 999;
+    }
+    .mode-toggle {
+      background: var(--button-bg);
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      color: var(--header-text);
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: background 0.3s;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .mode-toggle:hover {
+      background: var(--button-hover);
+    }
+    .buttons {
+      text-align: center;
+      margin: 10px 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 0 5px;
+    }
+    .buttons button {
+      background: var(--button-bg);
+      border: none;
+      padding: 8px 12px;
+      margin: 3px;
+      border-radius: 4px;
+      color: var(--header-text);
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: background 0.3s;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      flex-grow: 1;
+      max-width: 45%;
+    }
+    .buttons button:hover {
+      background: var(--button-hover);
+    }
+    .refresh-button {
+      background: var(--refresh-button-bg) !important;
+      color: white !important;
+      padding: 10px 15px !important;
+      margin: 10px auto !important;
+      display: block !important;
+      width: 80% !important;
+      max-width: 300px !important;
+      font-size: 1.1em !important;
+      border-radius: 25px !important;
+    }
+    .refresh-button:hover {
+      background: var(--refresh-button-hover) !important;
+    }
+    .article {
+      background: var(--article-bg);
+      margin: 10px;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: background 0.3s;
+    }
+    .article h2 {
+      font-size: 1.3em;
+      margin-bottom: 8px;
+    }
+    .article .source {
+      font-size: 0.8em;
+      color: var(--source-text);
+      margin-bottom: 8px;
+    }
+    .article p {
+      font-size: 0.95em;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    .keywords {
+      margin-top: 8px;
+    }
+    .keyword {
+      display: inline-block;
+      background: var(--keyword-bg);
+      color: var(--header-text);
+      padding: 3px 8px;
+      margin: 2px;
+      border-radius: 15px;
+      font-size: 0.8em;
+    }
+    a {
+      color: var(--link-color);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      font-size: 1.2em;
+    }
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: var(--button-bg);
+      animation: spin 1s linear infinite;
+      margin: 10px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .offline-message {
+      background: #e74c3c;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      display: none;
+    }
+    .install-prompt {
+      background: #3498db;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      margin: 10px;
+      border-radius: 8px;
+      display: none;
+    }
+    .install-button {
+      background: white;
+      color: #3498db;
+      border: none;
+      padding: 5px 15px;
+      border-radius: 4px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="offline-message" class="offline-message">
+    شما آفلاین هستید. اخبار ذخیره شده قبلی نمایش داده می‌شود.
+  </div>
+  <div id="install-prompt" class="install-prompt">
+    این برنامه را به صفحه اصلی خود اضافه کنید
+    <button id="install-button" class="install-button">نصب</button>
+  </div>
+  <div class="container">
+    <div class="header">
+      <div class="toggle-container">
+        <button id="mode-toggle" class="mode-toggle">حالت روشن</button>
+      </div>
+      <h1>خبرنامه ایران</h1>
+      <button id="refresh-button" class="refresh-button">بروزرسانی اخبار</button>
+      <div class="buttons">
+        <button data-category="all">همه اخبار</button>
+        <button data-category="ارز">ارز</button>
+        <button data-category="طلا">طلا</button>
+        <button data-category="بورس">بورس</button>
+        <button data-category="اقتصاد">اقتصاد</button>
+        <button data-category="مسکن">مسکن</button>
+        <button data-category="انرژی">انرژی</button>
+        <button data-category="پتروشیمی">پتروشیمی</button>
+        <button data-category="سیاست">سیاست</button>
+      </div>
+    </div>
+    
+    <div id="news-container">
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>در حال بارگذاری اخبار...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Register service worker for PWA functionality
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => console.log('Service Worker registered'))
+          .catch(err => console.log('Service Worker registration failed: ', err));
+      });
+    }
+    
+    // Check if online and update UI accordingly
+    function updateOnlineStatus() {
+      const offlineMessage = document.getElementById('offline-message');
+      if (navigator.onLine) {
+        offlineMessage.style.display = 'none';
+      } else {
+        offlineMessage.style.display = 'block';
+      }
+    }
+    
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
+    
+    // Handle PWA installation
+    let deferredPrompt;
+    const installPrompt = document.getElementById('install-prompt');
+    const installButton = document.getElementById('install-button');
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installPrompt.style.display = 'block';
+    });
+    
+    installButton.addEventListener('click', (e) => {
+      installPrompt.style.display = 'none';
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        deferredPrompt = null;
+      });
+    });
+    
+    // Dark/Light mode toggle
+    function toggleMode() {
+      document.body.classList.toggle('light-mode');
+      const toggleButton = document.getElementById('mode-toggle');
+      if(document.body.classList.contains('light-mode')){
+        toggleButton.textContent = 'حالت تاریک';
+        localStorage.setItem('theme', 'light');
+      } else {
+        toggleButton.textContent = 'حالت روشن';
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+    
+    // Apply saved theme
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.add('light-mode');
+      document.getElementById('mode-toggle').textContent = 'حالت تاریک';
+    }
+    
+    // Category filtering
+    function showCategory(category) {
+      const articles = document.querySelectorAll('.article');
+      articles.forEach(function(elem) {
+        if (category === 'all') {
+          elem.style.display = 'block';
+        } else {
+          // Use data attributes for more reliable category matching
+          const articleCategory = elem.getAttribute('data-category');
+          const articleCategoryHyphenated = elem.getAttribute('data-category-hyphenated');
+          const categoryWithoutHyphens = category.replace(/-/g, ' ');
+          
+          // Check if the category matches either with or without hyphens
+          const hasCategory = 
+            articleCategory === categoryWithoutHyphens || 
+            articleCategoryHyphenated === category;
+          
+          elem.style.display = hasCategory ? 'block' : 'none';
+          
+          // Debug info - log to console to help troubleshoot
+          console.log(`Article: ${articleCategory}, Button: ${categoryWithoutHyphens}, Match: ${hasCategory}`);
+        }
+      });
+      // Save selected category
+      localStorage.setItem('selectedCategory', category);
+    }
+    
+    // RSS Feed URLs organized by category
+    const RSS_FEEDS = {
+      'ارز': ['https://eghtesaad24.ir/fa/rss/12'],
+      'طلا': ['https://eghtesaad24.ir/fa/rss/11'],
+      'بورس': ['https://www.boursenews.ir/fa/rss/14'],
+      'اقتصاد': ['https://eghtesaad24.ir/fa/rss/4'],
+      'مسکن': ['https://eghtesaad24.ir/fa/rss/10'],
+      'انرژی': ['https://eghtesaad24.ir/fa/rss/13'],
+      'پتروشیمی': [
+        'https://nabzeenergy.ir/service/petrochemical/feed/',
+        'https://naftiha.ir/News/Feed?id=8'
+      ],
+      'سیاست': [
+        'https://eslahatnews.com/fa/rss/10',
+        'https://khabarfarsi.com/rss/category/2470'
+      ]
+    };
+    
+    // Keywords for each category
+    const PREDEFINED_KEYWORDS = {
+      'ارز': ['دلار', 'ارز', 'نرخ ارز', 'تجارت خارجی', 'بازار ارز'],
+      'طلا': ['طلا', 'سکه', 'قیمت طلا', 'بازار طلا', 'قیمت سکه'],
+      'بورس': ['بورس', 'سهام', 'سرمایه‌گذاری', 'شاخص', 'بازار سرمایه'],
+      'اقتصاد': ['اقتصاد', 'تورم', 'بازار', 'رشد اقتصادی', 'اقتصاد کلان'],
+      'مسکن': ['مسکن', 'قیمت مسکن', 'رهن', 'اجاره', 'املاک'],
+      'انرژی': ['انرژی', 'برق', 'گاز', 'سوخت', 'انرژی تجدیدپذیر'],
+      'پتروشیمی': ['پتروشیمی', 'نفت', 'گاز', 'مواد شیمیایی', 'صنایع نفتی'],
+      'سیاست': ['سیاست', 'انتخابات', 'دولت', 'مجلس', 'مناظره', 'حزب']
+    };
+    
+    // Clean HTML tags from text
+    function cleanText(text) {
+      return text.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+    }
+    
+    // Extract relevant keywords from text
+    function extractRelevantKeywords(category, text, maxKeywords = 2) {
+      // Make sure we're using the correct category name for keyword lookup
+      const mappedCategory = mapCategoryName(category);
+      const keywords = PREDEFINED_KEYWORDS[mappedCategory] || [];
+      const relevant = [];
+      const textLower = text.toLowerCase();
+      
+      for (const keyword of keywords) {
+        if (textLower.includes(keyword.toLowerCase())) {
+          relevant.push(keyword);
+        }
+        if (relevant.length >= maxKeywords) {
+          break;
+        }
+      }
+      
+      return relevant;
+    }
+    
+    // Fetch news directly from RSS feeds
+    async function fetchNews() {
+      const newsContainer = document.getElementById('news-container');
+      newsContainer.innerHTML = `
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>در حال بارگذاری اخبار...</p>
+        </div>
+      `;
+      
+      try {
+        // Use a CORS proxy to access RSS feeds
+        const corsProxy = 'https://api.allorigins.win/raw?url=';
+        const articles = [];
+        
+        // Fetch from each RSS feed
+        for (const [category, feeds] of Object.entries(RSS_FEEDS)) {
+          for (const feedUrl of feeds) {
+            try {
+              // Fetch the RSS feed through the CORS proxy
+              const response = await fetch(corsProxy + encodeURIComponent(feedUrl));
+              if (!response.ok) {
+                console.error(`Failed to fetch ${feedUrl}: ${response.status}`);
+                continue;
+              }
+              
+              const data = await response.text();
+              
+              // Parse the XML
+              const parser = new DOMParser();
+              const xmlDoc = parser.parseFromString(data, 'text/xml');
+              
+              // Extract items/entries
+              const items = xmlDoc.querySelectorAll('item');
+              
+              // Process each item (limit to 5 per feed)
+              let count = 0;
+              for (const item of items) {
+                if (count >= 5) break;
+                
+                const title = item.querySelector('title')?.textContent || '';
+                let description = item.querySelector('description')?.textContent || '';
+                const link = item.querySelector('link')?.textContent || '#';
+                
+                // Clean description
+                const cleanDescription = cleanText(description);
+                
+                // Extract keywords
+                const combinedText = `${title} ${cleanDescription}`;
+                const keywords = extractRelevantKeywords(category, combinedText);
+                
+                // Get source name
+                const source = xmlDoc.querySelector('channel > title')?.textContent || 'خبرگزاری';
+                
+                // Add to articles array
+                articles.push({
+                  title,
+                  description: cleanDescription,
+                  link,
+                  category,
+                  keywords,
+                  source
+                });
+                
+                count++;
+              }
+            } catch (error) {
+              console.error(`Error processing feed ${feedUrl}:`, error);
+            }
+          }
+        }
+        
+        // If no articles were fetched, try to use cached news
+        if (articles.length === 0) {
+          throw new Error('No articles fetched from any feed');
+        }
+        
+        // Save to localStorage for offline use
+        localStorage.setItem('cachedNews', JSON.stringify(articles));
+        localStorage.setItem('lastFetched', new Date().toISOString());
+        
+        displayNews(articles);
+      } catch (error) {
+        console.error('Error fetching news:', error);
+        // Try to load from cache if fetch fails
+        const cachedNews = localStorage.getItem('cachedNews');
+        if (cachedNews) {
+          displayNews(JSON.parse(cachedNews));
+          const lastFetched = localStorage.getItem('lastFetched');
+          newsContainer.insertAdjacentHTML('afterbegin', `
+            <div class="offline-message">
+              خطا در بارگذاری اخبار جدید. نمایش اخبار ذخیره شده از ${new Date(lastFetched).toLocaleString('fa-IR')}
+            </div>
+          `);
+        } else {
+          // If no cached news, show sample news
+          const sampleNews = [
+            {
+              title: "افزایش قیمت دلار در بازار آزاد",
+              description: "قیمت دلار در بازار آزاد امروز با افزایش همراه بود. کارشناسان دلیل این افزایش را تحولات بین‌المللی می‌دانند.",
+              link: "#",
+              category: "ارز",
+              keywords: ["دلار", "بازار ارز"],
+              source: "خبرگزاری اقتصادی"
+            },
+            {
+              title: "کاهش قیمت سکه در بازار",
+              description: "قیمت سکه امروز در بازار با کاهش نسبی همراه بود. این کاهش قیمت پس از چند روز افزایش متوالی رخ داده است.",
+              link: "#",
+              category: "طلا",
+              keywords: ["سکه", "قیمت طلا"],
+              source: "خبرگزاری اقتصادی"
+            },
+            {
+              title: "رشد شاخص بورس در معاملات امروز",
+              description: "شاخص کل بورس اوراق بهادار تهران در پایان معاملات امروز با رشد مواجه شد.",
+              link: "#",
+              category: "بورس",
+              keywords: ["بورس", "شاخص"],
+              source: "بورس نیوز"
+            }
+          ];
+          displayNews(sampleNews);
+          newsContainer.insertAdjacentHTML('afterbegin', `
+            <div class="offline-message">
+              خطا در بارگذاری اخبار. نمایش اخبار نمونه.
+            </div>
+          `);
+        }
+      }
+    }
+    
+    // Map old category names to new ones
+    function mapCategoryName(category) {
+      const categoryMap = {
+        'دلار و ارز': 'ارز',
+        'طلا و سکه': 'طلا'
+      };
+      
+      return categoryMap[category] || category;
+    }
+    
+    // Display news in the UI
+    function displayNews(articles) {
+      const newsContainer = document.getElementById('news-container');
+      newsContainer.innerHTML = '';
+      
+      if (articles.length === 0) {
+        newsContainer.innerHTML = `
+          <div class="article">
+            <h2>خبری یافت نشد</h2>
+            <p>در حال حاضر خبری برای نمایش وجود ندارد.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      articles.forEach(article => {
+        // Map old category names to new ones
+        article.category = mapCategoryName(article.category);
+        
+        // Store both the original category and the hyphenated version as data attributes
+        const categoryHyphenated = article.category.replace(/\s+/g, "-");
+        const keywordsHTML = article.keywords.map(keyword => 
+          `<span class="keyword">${keyword}</span>`
+        ).join('');
+        
+        const articleHTML = `
+          <div class="article ${categoryHyphenated}" data-category="${article.category}" data-category-hyphenated="${categoryHyphenated}">
+            <h2><a href="${article.link}" target="_blank">${article.title}</a></h2>
+            <p class="source">منبع: ${article.source}</p>
+            <p>${article.description}</p>
+            <div class="keywords">
+              ${keywordsHTML}
+            </div>
+          </div>
+        `;
+        
+        newsContainer.insertAdjacentHTML('beforeend', articleHTML);
+      });
+      
+      // Apply saved category filter
+      const savedCategory = localStorage.getItem('selectedCategory') || 'all';
+      showCategory(savedCategory);
+      
+      // Highlight the selected category button
+      document.querySelectorAll('.buttons button').forEach(button => {
+        if (button.getAttribute('data-category') === savedCategory) {
+          button.style.opacity = '1';
+          button.style.fontWeight = 'bold';
+        } else {
+          button.style.opacity = '0.8';
+          button.style.fontWeight = 'normal';
+        }
+      });
+    }
+    
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', function() {
+      // Handle mode toggle button
+      const modeToggle = document.getElementById('mode-toggle');
+      ['click', 'touchend'].forEach(function(eventType) {
+        modeToggle.addEventListener(eventType, function(e) {
+          e.preventDefault();
+          toggleMode();
+        }, false);
+      });
+      
+      // Handle refresh button
+      const refreshButton = document.getElementById('refresh-button');
+      ['click', 'touchend'].forEach(function(eventType) {
+        refreshButton.addEventListener(eventType, function(e) {
+          e.preventDefault();
+          fetchNews();
+        }, false);
+      });
+      
+      // Handle category buttons
+      const categoryButtons = document.querySelectorAll('.buttons button');
+      categoryButtons.forEach(function(button) {
+        ['click', 'touchend'].forEach(function(eventType) {
+          button.addEventListener(eventType, function(e) {
+            e.preventDefault();
+            const category = this.getAttribute('data-category');
+            
+            // Update button styles
+            categoryButtons.forEach(btn => {
+              btn.style.opacity = '0.8';
+              btn.style.fontWeight = 'normal';
+            });
+            this.style.opacity = '1';
+            this.style.fontWeight = 'bold';
+            
+            showCategory(category);
+          }, false);
+        });
+      });
+      
+      // Initial news fetch
+      fetchNews();
+    });
+  </script>
+</body>
+</html>
